@@ -48,7 +48,7 @@ h1, h2, h3, h4, h5, h6, p, a, ul, span, li, img, inpot, button{ margin: 0; paddi
 
 h1,h2,h3,h4,h5,h6{ line-height: 1.5; font-weight: inherit; }
 
-h1,h2,h3{ font-family: 'Charm', cursive; }
+h1,h2,h3{ font-family: 'Dancing Script', cursive; }
 
 p{ line-height: 1.6; font-size: 1.05em; font-weight: 400; color: #555; }
 
@@ -241,13 +241,19 @@ header .main-menu li.drop-down a.mouseover + ul.drop-down-menu{ display: block;
 .menu-nav-icon{ display: none; height: 60px; width: 50px; text-align: center; line-height: 60px; cursor: pointer; 
 	font-size: 1.8em; }
 
-	
-	
+	@media only screen and (max-width: 767px) {
+		.brcss{
+			display: block !important;
+		}
+	}
+	.brcss{
+		display: none;
+	}
 /* ---------------------------------
 4. SLIDER
 --------------------------------- */
 
-.main-slider{ height: 100vh; position: relative; z-index: 1; 
+.main-slider{ height: 100vh; position: relative; z-index: 1;     background-position: center;
 	background-image: url(../../images/slider-1-1600x900.jpg); background-size: cover; color: #fff; } 
 
 .main-slider:after{ content:''; position: absolute; top: 0; bottom: 0; left: 0; right: 0; 
