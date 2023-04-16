@@ -27,7 +27,26 @@
     <div> <label>Liên kết Linh hồn - Nhân cách: </label><label id="vallhnc"></label></div>
     <div> <label>Thiếu: </label><label id="valThieu"></label></div>
     <div> <label>Đam mê: </label><label id="valDamMe"></label></div>
-    
+    <div> <label>----------------------</label></div>
+    <div> <label>----------------------</label></div>
+    <div> <label>Năm </label> <input id="nam" type="number" value="2023"> <label><label id="valNamInput"></label>:
+        </label>
+        <label id="valNam"></label>
+    </div>
+    <div> <label>Tháng </label> <input id="thang" type="number" value="4"> <label><label id="valInputThang"></label>:
+        </label>
+        <label id="valThang"></label>
+    </div>
+    <div> <label>----------------------</label></div>
+    <div> <label>Chặng 1: (<label class="valchangC1"></label>): </label><label id="valChang1"></label></div>
+    <div> <label>Chặng 2: (<label class="valchangC2"></label>): </label><label id="valChang2"></label></div>
+    <div> <label>Chặng 3: (<label class="valchangC3"></label>): </label><label id="valChang3"></label></div>
+    <div> <label>Chặng 4: (<label class="valchangC4"></label>): </label><label id="valChang4"></label></div>
+    <div> <label>----------------------</label></div>
+    <div> <label>Thách thức 1: (<label class="valchangC1"></label>): </label><label id="valThachThuc1"></label></div>
+    <div> <label>Thách thức 2: (<label class="valchangC2"></label>): </label><label id="valThachThuc2"></label></div>
+    <div> <label>Thách thức 3: (<label class="valchangC3"></label>): </label><label id="valThachThuc3"></label></div>
+    <div> <label>Thách thức 4: (<label class="valchangC4"></label>): </label><label id="valThachThuc4"></label></div>
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <link rel="stylesheet" href="/resources/demos/style.css">
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
@@ -35,14 +54,50 @@
     <script>$('#date').datepicker({ dateFormat: 'dd-mm-yy' }).val();</script>
     <script>
         $(document).ready(function () {
-            $("#cal").click(function () {
-                cal();
-            });
-            $("#clear").click(function () {
+
+           // clear();
+            function clear() {
                 $('#date').datepicker({ dateFormat: 'dd-mm-yy' }).val("")
                 $("#name").val("");
                 $("#valDuongDoi").empty();
                 $("#valSuMenh").empty();
+                $("#nam").val((new Date()).getFullYear());
+                $("#valNamInput").html((new Date()).getFullYear());
+                $("#thang").val((new Date()).getMonth() + 1);
+                $("#valInputThang").html((new Date()).getMonth() + 1);
+                $("#valSuMenh").empty();
+                $("#valLinhHon").empty();
+                $("#valNhanCach").empty();
+                $("#valTruongThanh").empty();
+                $("#valCanBang").empty();
+                $("#valNgaySinh").empty();
+                $("#valddsm").empty();
+                $("#vallhnc").empty();
+                $("#valThieu").empty();
+                $("#valDamMe").empty();
+
+                $("#valNam").empty();
+                $("#valThang").empty();
+
+                $("#valChang1").empty();
+                $("#valChang2").empty();
+                $("#valChang3").empty();
+                $("#valChang4").empty();
+                $("#valThachThuc1").empty();
+                $("#valThachThuc2").empty();
+                $("#valThachThuc3").empty();
+                $("#valThachThuc4").empty();
+                $(".valchangC1").empty();
+                $(".valchangC2").empty();
+                $(".valchangC3").empty();
+                $(".valchangC4").empty();
+            }
+
+            $("#cal").click(function () {
+                cal();
+            });
+            $("#clear").click(function () {
+                clear();
             });
 
             function getNumber(number, listNumberReturn) {
@@ -204,9 +259,9 @@
                 let listT = [];
                 let max = listN[0].count;
                 for (let i = 0; i < listN.length; i++) {
-                    if (max === listN[i].count){
+                    if (max === listN[i].count) {
                         listT.push(listN[i].num)
-                    }else{
+                    } else {
                         break;
                     }
                 }
@@ -224,8 +279,69 @@
                 calNgaySinh();
                 calThieu();
                 calDamMe();
+                calNam();
+                calNam();
+                calThang();
+                calChang();
+                valThachThuc();
                 // var a = $("#name").val();
                 // alert(removeVietnameseTones(a));
+            }
+            var nNam = 0;
+            function calNam() {
+                var dateString = $('#date').datepicker({ dateFormat: 'dd-mm-yy' }).val();
+                dateString = dateString.split("-");
+                dateString[2] = $("#nam").val();
+                let totalCal = 0;
+                for (let i = 0; i < dateString.length; i++) {
+                    let nameL1 = dateString[i].toString();
+                    let total1N = 0;
+                    for (var j = 0; j < nameL1.length; j++) {
+                        total1N = total1N + nameL1[j] * 1;
+                    }
+                    totalCal = totalCal + getNumber(total1N, [11, 22, 33]);
+                }
+                nNam = (getNumber(totalCal, []))
+                $("#valNam").html(nNam);
+            }
+
+            function calThang() {
+                let thang = $("#thang").val();
+                let nThang = (getNumber(nNam + thang * 1, [11, 22, 33]))
+                $("#valThang").html(nThang);
+            }
+
+            function calChang() {
+                //nDuongDoi
+                let c1 = 36 - (getNumber(nDuongDoi, [])) * 1
+                $(".valchangC1").html(`0-${c1}`);
+                $(".valchangC2").html(`${c1}-${c1 + 9}`);
+                $(".valchangC3").html(`${c1 + 9}-${c1 + 18}`);
+                $(".valchangC4").html(`${c1 + 18}-hết`);
+                var dateString = $('#date').datepicker({ dateFormat: 'dd-mm-yy' }).val();
+                dateString = dateString.split("-");
+                let cc1 = (getNumber(getNumber(dateString[0], []) * 1 + getNumber(dateString[1], []) * 1, [])) * 1;
+                $("#valChang1").html(cc1);
+                let cc2 = (getNumber(getNumber(dateString[0], []) * 1 + getNumber(dateString[2], []) * 1, [])) * 1;
+                $("#valChang2").html(cc2);
+                let cc3 = (getNumber(getNumber(cc1, []) * 1 + getNumber(cc2, []) * 1, [])) * 1;
+                $("#valChang3").html(cc3);
+                let cc4 = (getNumber(getNumber(dateString[1], []) * 1 + getNumber(dateString[2], []) * 1, [])) * 1;
+                $("#valChang4").html(cc4);
+            }
+
+            function valThachThuc() {
+                //nDuongDoi
+                var dateString = $('#date').datepicker({ dateFormat: 'dd-mm-yy' }).val();
+                dateString = dateString.split("-");
+                let cc1 = (getNumber(Math.abs(getNumber(dateString[0], []) * 1 - getNumber(dateString[1], []) * 1, []))) * 1;
+                $("#valThachThuc1").html(cc1);
+                let cc2 = (getNumber(Math.abs(getNumber(dateString[0], []) * 1 - getNumber(dateString[2], []) * 1, []))) * 1;
+                $("#valThachThuc2").html(cc2);
+                let cc3 = (getNumber(Math.abs(getNumber(cc1, []) * 1 - getNumber(cc2, []) * 1, []))) * 1;
+                $("#valThachThuc3").html(cc3);
+                let cc4 = (getNumber(Math.abs(getNumber(dateString[1], []) * 1 - getNumber(dateString[2], []) * 1, []))) * 1;
+                $("#valThachThuc4").html(cc4);
             }
         });
 
