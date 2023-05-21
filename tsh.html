@@ -55,7 +55,7 @@
     <script>
         $(document).ready(function () {
 
-           // clear();
+            // clear();
             function clear() {
                 $('#date').datepicker({ dateFormat: 'dd-mm-yy' }).val("")
                 $("#name").val("");
@@ -119,11 +119,15 @@
                 let totalCal = 0;
                 for (let i = 0; i < dateString.length; i++) {
                     let nameL1 = dateString[i].toString();
-                    let total1N = 0;
-                    for (var j = 0; j < nameL1.length; j++) {
-                        total1N = total1N + nameL1[j] * 1;
-                    }
-                    totalCal = totalCal + getNumber(total1N, [11, 22, 33]);
+                    // let total1N = 0;
+                    // if ([11, 22].includes(nameL1 * 1)) {
+                    //     total1N = nameL1 * 1;
+                    // } else {
+                    //     for (var j = 0; j < nameL1.length; j++) {
+                    //         total1N = total1N + nameL1[j] * 1;
+                    //     }
+                    // }
+                    totalCal = totalCal + getNumber(nameL1*1, [11, 22]);
                 }
                 nDuongDoi = (getNumber(totalCal, [11, 22, 33]))
                 $("#valDuongDoi").html(nDuongDoi);
