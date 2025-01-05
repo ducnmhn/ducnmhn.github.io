@@ -110,6 +110,7 @@
 
         function getDataKeywords(isFirst) {
             var settingInput = localStorage.getItem('data-keyword');
+            if (settingInput == null) return;
             let s = settingInput.split("\n");
             let dataSetting = [];
             for (let i = 0; i < s.length; i++) {
