@@ -32,7 +32,7 @@
         <div class="container mt-3">
             <h2>Phát hiện từ khoá vi phạm</h2>
             <!-- <h4>Nạp dữ liệu ... </h4> -->
-            <h4>Số lượng dữ liệu từ khoá: <span id="kk"></span></h4>
+            <h4>Số lượng dữ liệu từ khoá: <span id="kk">0</span></h4>
 
 
             <ul class="nav nav-pills" role="tablist">
@@ -42,13 +42,16 @@
                 <li class="nav-item">
                     <a class="nav-link " data-bs-toggle="pill" href="#setting">Dữ liệu từ khoá</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link " data-bs-toggle="pill" href="#tag">Tag line</a>
+                </li>
             </ul>
 
             <div class="tab-content">
                 <div id="home" class="container tab-pane active ">
                     <h3>Nội Dung</h3>
                     <textarea class="form-control" rows={5} id="data-input" style="height: 166px;"></textarea>
-                    
+
                     <div id="accordion">
                         <div class="card">
                             <div class="card-header" id="headingOne">
@@ -68,7 +71,7 @@
                             </div>
                         </div>
                     </div>
-           
+
                     <button type="button" class="btn btn-primary" id="copy-done">Sao chép nội dung đã chỉnh sửa</button>
                     <br></br>
                     <span style="white-space:pre-line;" id="data-done">
@@ -83,6 +86,15 @@
                         <button type="button" class="btn btn-primary" id="b-key-word">Lưu dữ liệu</button>
                     </div>
                 </div>
+                <div id="tag" class="container tab-pane  fade">
+                    <h3>Tag Line</h3>
+
+                    <div class="form-group">
+                        <textarea class="form-control" rows={10} id="tag-word" style="height: 266px;"></textarea>
+                        <br></br>
+                        <button type="button" class="btn btn-primary" id="b-tag-word">Lưu dữ liệu</button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -91,7 +103,7 @@
     <script>
         window.keyword = [];
         getDataKeywords();
-
+        initDataTagW();
         $('#show-hide-a').click(function () {
             $('.collapse').collapse('toggle');
         });
@@ -106,7 +118,23 @@
         $('#b-key-word').click(function () {
             localStorage.setItem('data-keyword', $('#key-word').val());
             getDataKeywords(true);
+            try {
+               var a =  $('#data-input').val();
+               makeData(a);
+            } catch (error) {
+                
+            }
         });
+
+        $('#b-tag-word').click(function () {
+            localStorage.setItem('data-tag', $('#tag-word').val());
+        });
+
+        function initDataTagW(){
+            var settingInput = localStorage.getItem('data-tag');
+            if (settingInput == null) return;
+            $("#tag-word").val(settingInput);
+        }
 
         function getDataKeywords(isFirst) {
             var settingInput = localStorage.getItem('data-keyword');
@@ -161,7 +189,7 @@
         $('#copy-done').click(async function () {
             await navigator.clipboard.writeText(window.copyN);
         });
-        
+
 
         document.querySelector('emoji-picker').addEventListener('emoji-click', e => {
             // textFieldEdit.insert(document.querySelector('input'), e.detail.unicode)
