@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 
 <head>
     <meta charset="utf-8" />
-
-    <title>Key words change!</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kiểm Tra Từ Khoá Vi Phạm</title>
     <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         crossorigin="anonymous">
@@ -12,16 +12,371 @@
         crossorigin="anonymous"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Color+Emoji" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Color+Emoji&display=swap" rel="stylesheet">
+    
     <style>
-        emoji-picker {
-            --emoji-font-family: "Noto Color Emoji";
-            --num-columns: 30;
+        :root {
+            --bg-light: #f0f2f5;
+            --card-bg: #ffffff;
+            --card-border: #e4e6eb;
+            
+            --accent-color: #1877f2;
+            --accent-hover: #166fe5;
+            --accent-glow: rgba(24, 119, 242, 0.15);
+            
+            --text-title: #050505;
+            --text-body: #1c1e21;
+            --text-secondary: #65676b;
+            --text-muted: #8a8d91;
+            
+            --bg-input: #ffffff;
+            --border-input: #ced0d4;
+            --border-focus: #1877f2;
+            
+            --del-bg: #ffebe9;
+            --del-text: #d93025;
+            --del-border: #f5c2c2;
+            
+            --mark-bg: #e6f4ea;
+            --mark-text: #137333;
+            --mark-border: #c2e7c9;
         }
 
+        body {
+            background-color: var(--bg-light);
+            min-height: 100vh;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            color: var(--text-body);
+            padding-bottom: 4rem;
+            position: relative;
+        }
+        
+        /* Soft ambient decoration */
+        body::before {
+            content: "";
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            top: 0;
+            left: 10%;
+            background: radial-gradient(circle, rgba(24, 119, 242, 0.05) 0%, rgba(24, 119, 242, 0) 70%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .main-container {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 2.5rem;
+            margin-top: 3.5rem;
+            box-shadow: 0 12px 28px 0 rgba(0, 0, 0, 0.06), 0 2px 4px 0 rgba(0, 0, 0, 0.04);
+        }
+
+        h2 {
+            font-weight: 800;
+            color: #111827;
+            margin-bottom: 0.25rem;
+            letter-spacing: -0.5px;
+        }
+
+        .header-subtitle {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .keyword-badge {
+            background: #e7f3ff;
+            border: 1px solid #d0e7ff;
+            padding: 0.5rem 1.25rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            color: #1877f2;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+        }
+
+        .keyword-badge .dot {
+            width: 8px;
+            height: 8px;
+            background-color: #10b981;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 8px #10b981;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(0.9);
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            }
+            70% {
+                transform: scale(1);
+                box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+            }
+            100% {
+                transform: scale(0.9);
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+            }
+        }
+
+        /* Nav Pills Custom Styling */
+        .nav-pills {
+            background: #f0f2f5;
+            padding: 6px;
+            border-radius: 16px;
+            border: 1px solid var(--card-border);
+            margin: 2.5rem 0;
+            display: flex;
+        }
+
+        .nav-pills .nav-item {
+            flex: 1;
+        }
+
+        .nav-pills .nav-link {
+            color: var(--text-secondary);
+            border-radius: 12px;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 12px;
+            border: 1px solid transparent;
+            font-size: 0.95rem;
+        }
+
+        .nav-pills .nav-link.active {
+            background: var(--accent-color);
+            color: #ffffff;
+            box-shadow: 0 6px 16px var(--accent-glow);
+        }
+
+        .nav-pills .nav-link:hover:not(.active) {
+            background: rgba(0, 0, 0, 0.05);
+            color: var(--text-title);
+        }
+
+        /* Tab content */
+        .tab-pane h3.tab-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-title);
+            margin-bottom: 0.5rem;
+        }
+        
+        .tab-pane .tab-desc {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Form elements */
+        .form-control {
+            background-color: var(--bg-input);
+            border: 1px solid var(--border-input);
+            color: #050505;
+            border-radius: 12px;
+            padding: 1.25rem;
+            transition: all 0.2s ease;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-size: 15px;
+            line-height: 1.4;
+        }
+
+        .form-control:focus {
+            background-color: #ffffff;
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 4px var(--accent-glow);
+            color: #050505;
+        }
+
+        .form-control::placeholder {
+            color: var(--text-muted);
+        }
+
+        /* Custom buttons styling */
+        .btn-primary {
+            background: var(--accent-color);
+            border: none;
+            border-radius: 14px;
+            font-weight: 600;
+            padding: 12px 28px;
+            color: #ffffff;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px var(--accent-glow);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px var(--accent-glow);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-trigger-emoji {
+            background: rgba(0, 0, 0, 0.04);
+            border: 1px solid var(--border-input);
+            color: var(--text-secondary);
+            border-radius: 12px;
+            font-weight: 600;
+            padding: 8px 16px;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-trigger-emoji:hover {
+            background: rgba(0, 0, 0, 0.08);
+            color: var(--text-title);
+            border-color: #ced0d4;
+        }
+
+        /* Results / Output Container */
+        .output-container {
+            background-color: #ffffff;
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 1.25rem;
+            min-height: 200px;
+            max-height: 400px;
+            overflow-y: auto;
+            color: #050505;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-size: 15px;
+            line-height: 1.4;
+            transition: all 0.2s ease;
+        }
+
+        .output-container:hover {
+            border-color: #ced0d4;
+        }
+
+        .output-placeholder {
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        #key-word, #tag-word {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+        }
+
+        /* Del and Mark Highlighter overrides */
+        del {
+            text-decoration: line-through;
+            text-decoration-color: rgba(217, 48, 37, 0.6);
+            color: var(--del-text);
+            background-color: var(--del-bg);
+            border: 1px dashed var(--del-border);
+            border-radius: 6px;
+            padding: 2px 6px;
+            margin: 0 3px;
+            font-size: 0.95em;
+            display: inline-block;
+        }
+
+        mark {
+            background-color: var(--mark-bg);
+            color: var(--mark-text);
+            border: 1px solid var(--mark-border);
+            border-radius: 6px;
+            padding: 2px 6px;
+            margin: 0 3px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        /* Emoji Picker overrides */
         emoji-picker {
+            --emoji-font-family: "Noto Color Emoji";
+            --num-columns: 12;
+            --background: #ffffff;
+            --border-color: #ced0d4;
+            --category-button-active-background: var(--accent-color);
+            --input-border-color: #ced0d4;
+            --input-placeholder-color: var(--text-muted);
             width: 100%;
-            height: 50%;
+            height: 320px;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            border: 1px solid #ced0d4;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: 99px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 0, 0, 0.25);
+        }
+
+        /* Footer info */
+        .footer-info {
+            text-align: center;
+            margin-top: 3rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* Toast notifications customization */
+        .toast {
+            background: #ffffff;
+            border: 1px solid #ced0d4;
+            border-radius: 12px;
+            box-shadow: 0 12px 36px rgba(0,0,0,0.12);
+        }
+
+        .style-row {
+            transition: background-color 0.2s ease;
+            padding: 8px 12px;
+            border-radius: 10px;
+            margin-bottom: 4px;
+        }
+        
+        .style-row:hover {
+            background-color: #f0f2f5;
+        }
+        
+        .style-name {
+            font-size: 0.72rem;
+            color: #65676b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 700;
+        }
+        
+        .style-text {
+            font-size: 1.05rem;
+            color: #050505;
+            word-break: break-all;
+        }
+        
+        #style-previews-list {
+            max-height: 320px;
+            overflow-y: auto;
+            padding-right: 4px;
         }
     </style>
 </head>
@@ -29,92 +384,492 @@
 <body>
 
     <div id="root">
-        <div class="container mt-3">
-            <h2>Phát hiện từ khoá vi phạm</h2>
-            <!-- <h4>Nạp dữ liệu ... </h4> -->
-            <h4>Số lượng dữ liệu từ khoá: <span id="kk">0</span></h4>
+        <div class="container">
+            <div class="main-container">
+                <!-- Header section -->
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                    <div>
+                        <h2>Kiểm Tra Từ Khoá Vi Phạm</h2>
+                        <div class="header-subtitle">Nhận diện, thay thế các từ khoá nhạy cảm/vi phạm bản quyền</div>
+                    </div>
+                    <div>
+                        <div class="keyword-badge">
+                            <span class="dot"></span>
+                            <span>Từ khoá hoạt động: <span id="kk">0</span></span>
+                        </div>
+                    </div>
+                </div>
 
+                <!-- Tabs navigation -->
+                <ul class="nav nav-pills" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-bs-toggle="pill" href="#home">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-text me-2" viewBox="0 0 16 16">
+                                <path d="M5 4a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1H5zm-.5 2.5A.5.5 0 0 1 5 6h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5zM5 8a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1H5zm0 2a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1H5z"/>
+                                <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2zm10-1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1z"/>
+                            </svg>Nội Dung
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="pill" href="#setting">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gear me-2" viewBox="0 0 16 16">
+                                <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"/>
+                                <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.893 1.64.902 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.185 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.185l-.292-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.185-1.185l.159-.292a1.873 1.873 0 0 0-1.116-2.693l-.318-.094c-.835-.246-.835-1.428 0-1.674l.319-.094a1.873 1.873 0 0 0 1.115-2.692l-.16-.292c-.415-.764.42-1.6 1.185-1.185l.292.159a1.873 1.873 0 0 0 2.693-1.115l.094-.319z"/>
+                            </svg>Dữ liệu từ khoá
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="pill" href="#tag">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-tags me-2" viewBox="0 0 16 16">
+                                <path d="M3 2v4.586l7 7L14.586 9l-7-7H3zM2 2a1 1 0 0 1 1-1h4.586a1 1 0 0 1 .707.293l7 7a1 1 0 0 1 0 1.414l-4.586 4.586a1 1 0 0 1-1.414 0l-7-7A1 1 0 0 1 2 6.586V2z"/>
+                                <path d="M5.5 5a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1zm0 1a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM1 7.086a1 1 0 0 1 .293-.707L8.75 1.5l1.414 1.414L3.414 9.686A1 1 0 0 1 2 9.586V7.086z"/>
+                            </svg>Tag line
+                        </a>
+                    </li>
+                </ul>
 
-            <ul class="nav nav-pills" role="tablist">
-                <li class="nav-item">
-                    <a class="nav-link active" data-bs-toggle="pill" href="#home">Nội Dung</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link " data-bs-toggle="pill" href="#setting">Dữ liệu từ khoá</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link " data-bs-toggle="pill" href="#tag">Tag line</a>
-                </li>
-            </ul>
+                <!-- Tabs content -->
+                <div class="tab-content">
+                    
+                    <!-- Content Tab -->
+                    <div id="home" class="tab-pane fade show active">
+                        <div class="row g-4">
+                            
+                            <!-- Left Column: Input and Emoji Picker -->
+                            <div class="col-lg-6 d-flex flex-column gap-3">
+                                <div>
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <label for="data-input" class="fw-semibold text-secondary">Nội dung văn bản</label>
+                                        <div class="d-flex gap-2">
+                                            <button class="btn btn-trigger-emoji btn-sm" id="show-hide-a" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                                😊 Biểu tượng
+                                            </button>
+                                            <button class="btn btn-trigger-emoji btn-sm" id="show-hide-styles" type="button" data-bs-toggle="collapse" data-bs-target="#collapseStyles" aria-expanded="false" aria-controls="collapseStyles">
+                                                ✨ Kiểu chữ
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <textarea class="form-control" rows="8" id="data-input" placeholder="Nhập hoặc dán nội dung văn bản của bạn tại đây để kiểm tra..." style="height: 200px;"></textarea>
+                                </div>
+                                
+                                <div id="collapseOne" class="collapse" aria-labelledby="headingOne">
+                                    <div class="card-body p-0">
+                                        <emoji-picker emoji-version="15.0"></emoji-picker>
+                                    </div>
+                                </div>
 
-            <div class="tab-content">
-                <div id="home" class="container tab-pane active ">
-                    <h3>Nội Dung</h3>
-                    <textarea class="form-control" rows={5} id="data-input" style="height: 166px;"></textarea>
-
-                    <div id="accordion">
-                        <div class="card">
-                            <div class="card-header" id="headingOne">
-                                <h5 class="mb-0">
-                                    <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne"
-                                        aria-expanded="true" aria-controls="collapseOne" id="show-hide-a">
-                                        Show/hide Icon
-                                    </button>
-                                </h5>
+                                <div id="collapseStyles" class="collapse">
+                                    <div class="card border border-light-subtle rounded-3 p-3 bg-white">
+                                        <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+                                            <span class="fw-bold text-dark fs-6">✨ Kiểu chữ nghệ thuật (YayText)</span>
+                                            <span id="styles-guide-msg" class="text-muted small" style="font-size: 0.75rem;">Bôi đen để chuyển kiểu.</span>
+                                        </div>
+                                        <div id="style-previews-list">
+                                            <!-- Dynamically filled -->
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-
-                            <div id="collapseOne" class="collapse" aria-labelledby="headingOne"
-                                data-parent="#accordion">
-                                <div class="card-body">
-                                    <emoji-picker emoji-version="15.0"></emoji-picker>
+                            
+                            <!-- Right Column: Result Preview -->
+                            <div class="col-lg-6 d-flex flex-column gap-3">
+                                <div>
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="fw-semibold text-secondary">Kết quả đã xử lý</span>
+                                        <button type="button" class="btn btn-primary btn-sm px-3 py-1.5" id="copy-done">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-clipboard-plus me-1.5" viewBox="0 0 16 16">
+                                                <path d="M8 7a.5.5 0 0 1 .5.5V9H10a.5.5 0 0 1 0 1H8.5v1.5a.5.5 0 0 1-1 0V10H6a.5.5 0 0 1 0-1h1.5V7.5A.5.5 0 0 1 8 7z"/>
+                                                <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
+                                                <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
+                                            </svg>Sao chép kết quả
+                                        </button>
+                                    </div>
+                                    <div class="output-container" style="height: 200px;">
+                                        <span style="white-space:pre-line;" id="data-done">
+                                            <span class="output-placeholder">Nội dung sau khi kiểm tra và lọc từ khoá vi phạm sẽ hiển thị tại đây...</span>
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <button type="button" class="btn btn-primary" id="copy-done">Sao chép nội dung đã chỉnh sửa</button>
-                    <br></br>
-                    <span style="white-space:pre-line;" id="data-done">
-                    </span>
-                </div>
-                <div id="setting" class="container tab-pane  fade">
-                    <h3>Dữ liệu từ khoá</h3>
+                    <!-- Keywords Tab -->
+                    <div id="setting" class="tab-pane fade">
+                        <h3 class="tab-title">Cấu hình từ khoá vi phạm</h3>
+                        <div class="tab-desc">Khai báo các từ khoá cần phát hiện và từ thay thế tương ứng. Sử dụng định dạng: <code>từ_vi_phạm => từ_thay_thế</code> (mỗi dòng một cặp từ).</div>
 
-                    <div class="form-group">
-                        <textarea class="form-control" rows={10} id="key-word" style="height: 266px;"></textarea>
-                        <br></br>
-                        <button type="button" class="btn btn-primary" id="b-key-word">Lưu dữ liệu</button>
+                        <div class="form-group">
+                            <textarea class="form-control" rows="10" id="key-word" placeholder="Ví dụ:&#10;xấu => tốt&#10;dở => hay&#10;vi_phạm => đã_lọc" style="height: 280px; font-family: 'Courier New', Courier, monospace;"></textarea>
+                            <div class="mt-3">
+                                <button type="button" class="btn btn-primary" id="b-key-word">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-save me-2" viewBox="0 0 16 16">
+                                        <path d="M2 1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H9.5a1 1 0 0 0-1 1v7.293l2.646-2.647a.5.5 0 0 1 .708.708l-3.5 3.5a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L7.5 9.293V2a2 2 0 0 1 2-2H14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h2.5a.5.5 0 0 1 0 1H2z"/>
+                                    </svg>Lưu dữ liệu
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div id="tag" class="container tab-pane  fade">
-                    <h3>Tag Line</h3>
 
-                    <div class="form-group">
-                        <textarea class="form-control" rows={10} id="tag-word" style="height: 266px;"></textarea>
-                        <br></br>
-                        <button type="button" class="btn btn-primary" id="b-tag-word">Lưu dữ liệu</button>
+                    <!-- Tagline Tab -->
+                    <div id="tag" class="tab-pane fade">
+                        <h3 class="tab-title">Cấu hình Tag Line</h3>
+                        <div class="tab-desc">Khai báo danh sách các tag line sử dụng thêm vào văn bản (mỗi tag line nằm trên một dòng riêng biệt).</div>
+
+                        <div class="form-group">
+                            <textarea class="form-control" rows="10" id="tag-word" placeholder="Ví dụ:&#10;#tagline1&#10;#tagline2" style="height: 280px; font-family: 'Courier New', Courier, monospace;"></textarea>
+                            <div class="mt-3">
+                                <button type="button" class="btn btn-primary" id="b-tag-word">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-save me-2" viewBox="0 0 16 16">
+                                        <path d="M2 1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H9.5a1 1 0 0 0-1 1v7.293l2.646-2.647a.5.5 0 0 1 .708.708l-3.5 3.5a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L7.5 9.293V2a2 2 0 0 1 2-2H14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h2.5a.5.5 0 0 1 0 1H2z"/>
+                                    </svg>Lưu dữ liệu
+                                </button>
+                            </div>
+                        </div>
                     </div>
+                    
                 </div>
             </div>
+            
+            <div class="footer-info">
+                Thiết kế bởi Antigravity &copy; 2026. Công cụ lọc từ khoá hiệu quả và an toàn.
+            </div>
         </div>
-
     </div>
+
+    <!-- Toast Notifications Toast Template -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1050;">
+        <div id="appToast" class="toast align-items-center text-white border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body d-flex align-items-center gap-2">
+                    <span id="toast-message">Thông báo</span>
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
     <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
     <script>
         window.keyword = [];
+        
+        // Unicode text styling logic (YayText)
+        const mapChar = (c, styleKey) => {
+            return styleBaseChar(c, styleKey);
+        };
+
+        const styleBaseChar = (c, styleKey) => {
+            const code = c.charCodeAt(0);
+            switch(styleKey) {
+                case 'bold':
+                    if (code >= 65 && code <= 90) return String.fromCodePoint(0x1D400 + (code - 65));
+                    if (code >= 97 && code <= 122) return String.fromCodePoint(0x1D41A + (code - 97));
+                    if (code >= 48 && code <= 57) return String.fromCodePoint(0x1D7CE + (code - 48));
+                    break;
+                case 'italic':
+                    if (code === 104) return 'ℎ';
+                    if (code >= 65 && code <= 90) return String.fromCodePoint(0x1D434 + (code - 65));
+                    if (code >= 97 && code <= 122) return String.fromCodePoint(0x1D44E + (code - 97));
+                    break;
+                case 'boldItalic':
+                    if (code >= 65 && code <= 90) return String.fromCodePoint(0x1D468 + (code - 65));
+                    if (code >= 97 && code <= 122) return String.fromCodePoint(0x1D482 + (code - 97));
+                    break;
+                case 'sansBold':
+                    if (code >= 65 && code <= 90) return String.fromCodePoint(0x1D5D4 + (code - 65));
+                    if (code >= 97 && code <= 122) return String.fromCodePoint(0x1D5EE + (code - 97));
+                    if (code >= 48 && code <= 57) return String.fromCodePoint(0x1D7EC + (code - 48));
+                    break;
+                case 'sansItalic':
+                    if (code >= 65 && code <= 90) return String.fromCodePoint(0x1D608 + (code - 65));
+                    if (code >= 97 && code <= 122) return String.fromCodePoint(0x1D622 + (code - 97));
+                    break;
+                case 'sansBoldItalic':
+                    if (code >= 65 && code <= 90) return String.fromCodePoint(0x1D63C + (code - 65));
+                    if (code >= 97 && code <= 122) return String.fromCodePoint(0x1D656 + (code - 97));
+                    break;
+                case 'mono':
+                    if (code >= 65 && code <= 90) return String.fromCodePoint(0x1D670 + (code - 65));
+                    if (code >= 97 && code <= 122) return String.fromCodePoint(0x1D68A + (code - 97));
+                    if (code >= 48 && code <= 57) return String.fromCodePoint(0x1D7F6 + (code - 48));
+                    break;
+                case 'doubleStruck':
+                    const dsSpecials = {
+                        'C': '\u2102', 'H': '\u210D', 'N': '\u2115', 'P': '\u2119', 'Q': '\u211A', 'R': '\u211D', 'Z': '\u2124'
+                    };
+                    if (dsSpecials[c]) return dsSpecials[c];
+                    if (code >= 65 && code <= 90) return String.fromCodePoint(0x1D538 + (code - 65));
+                    if (code >= 97 && code <= 122) return String.fromCodePoint(0x1D552 + (code - 97));
+                    if (code >= 48 && code <= 57) return String.fromCodePoint(0x1D7D8 + (code - 48));
+                    break;
+                case 'script':
+                    const scrSpecials = {
+                        'B': '\u212C', 'E': '\u2130', 'F': '\u2131', 'H': '\u210B', 'I': '\u2110', 'L': '\u2112', 'M': '\u2133', 'R': '\u211B',
+                        'e': '\u212F', 'g': '\u210A', 'o': '\u2134'
+                    };
+                    if (scrSpecials[c]) return scrSpecials[c];
+                    if (code >= 65 && code <= 90) return String.fromCodePoint(0x1D49C + (code - 65));
+                    if (code >= 97 && code <= 122) return String.fromCodePoint(0x1D4B6 + (code - 97));
+                    break;
+                case 'scriptBold':
+                    if (code >= 65 && code <= 90) return String.fromCodePoint(0x1D4D0 + (code - 65));
+                    if (code >= 97 && code <= 122) return String.fromCodePoint(0x1D4EA + (code - 97));
+                    break;
+                case 'fraktur':
+                    const frakSpecials = {
+                        'C': '\u212D', 'H': '\u210C', 'I': '\u2111', 'R': '\u211C', 'Z': '\u2128'
+                    };
+                    if (frakSpecials[c]) return frakSpecials[c];
+                    if (code >= 65 && code <= 90) return String.fromCodePoint(0x1D504 + (code - 65));
+                    if (code >= 97 && code <= 122) return String.fromCodePoint(0x1D51E + (code - 97));
+                    break;
+                case 'frakturBold':
+                    if (code >= 65 && code <= 90) return String.fromCodePoint(0x1D56C + (code - 65));
+                    if (code >= 97 && code <= 122) return String.fromCodePoint(0x1D586 + (code - 97));
+                    break;
+                case 'bubble':
+                    if (code >= 65 && code <= 90) return String.fromCodePoint(0x24B6 + (code - 65));
+                    if (code >= 97 && code <= 122) return String.fromCodePoint(0x24D0 + (code - 97));
+                    if (code === 48) return '⓪';
+                    if (code >= 49 && code <= 57) return String.fromCodePoint(0x2460 + (code - 49));
+                    break;
+                case 'negativeBubble':
+                    if (code >= 65 && code <= 90) return String.fromCodePoint(0x1F150 + (code - 65));
+                    if (code >= 97 && code <= 122) return String.fromCodePoint(0x1F150 + (code - 97));
+                    if (code >= 49 && code <= 57) return String.fromCodePoint(0x2776 + (code - 49));
+                    if (code === 48) return '⓿';
+                    break;
+                case 'square':
+                    if (code >= 65 && code <= 90) return String.fromCodePoint(0x1F130 + (code - 65));
+                    if (code >= 97 && code <= 122) return String.fromCodePoint(0x1F130 + (code - 97));
+                    break;
+                case 'negativeSquare':
+                    if (code >= 65 && code <= 90) return String.fromCodePoint(0x1F170 + (code - 65));
+                    if (code >= 97 && code <= 122) return String.fromCodePoint(0x1F170 + (code - 97));
+                    break;
+                case 'smallCaps':
+                    const capsMap = {
+                        'a': 'ᴀ', 'b': 'ʙ', 'c': 'ᴄ', 'd': 'ᴅ', 'e': 'ᴇ', 'f': 'ғ', 'g': 'ɢ', 'h': 'ʜ', 'i': 'ɪ', 'j': 'ᴊ', 'k': 'ᴋ', 'l': 'ʟ', 'm': 'ᴍ', 'n': 'ɴ', 'o': 'ᴏ', 'p': 'ᴘ', 'q': 'ǫ', 'r': 'ʀ', 's': 's', 't': 'ᴛ', 'u': 'ᴜ', 'v': 'ᴠ', 'w': 'ᴡ', 'x': 'x', 'y': 'ʏ', 'z': 'ᴢ'
+                    };
+                    return capsMap[c.toLowerCase()] || c;
+                case 'strikeThrough':
+                    return c + '\u0336';
+                case 'underline':
+                    return c + '\u0332';
+                case 'slashThrough':
+                    return c + '\u0337';
+                case 'upsideDown':
+                    const uppers = ["∀","𐐒","Ɔ","◖","Ǝ","Ⅎ","⅁","H","I","ſ","ʞ","˥","M","N","O","Ԁ","Ό","ᴚ","S","⊥","∩","Λ","M","X","⅄","Z"];
+                    const lowers = ["ɐ","q","ɔ","p","ǝ","ɟ","ƃ","ɥ","ı","ɾ","ʞ","l","ɯ","u","o","d","b","ɹ","s","ʇ","u","ʌ","ʍ","x","ʎ","z"];
+                    if (code >= 65 && code <= 90) return uppers[code - 65];
+                    if (code >= 97 && code <= 122) return lowers[code - 97];
+                    break;
+            }
+            return c;
+        };
+
+        const stylers = {
+            bold: (text) => text.normalize("NFD").split('').map(c => mapChar(c, 'bold')).join(''),
+            italic: (text) => text.normalize("NFD").split('').map(c => mapChar(c, 'italic')).join(''),
+            boldItalic: (text) => text.normalize("NFD").split('').map(c => mapChar(c, 'boldItalic')).join(''),
+            sansBold: (text) => text.normalize("NFD").split('').map(c => mapChar(c, 'sansBold')).join(''),
+            sansItalic: (text) => text.normalize("NFD").split('').map(c => mapChar(c, 'sansItalic')).join(''),
+            sansBoldItalic: (text) => text.normalize("NFD").split('').map(c => mapChar(c, 'sansBoldItalic')).join(''),
+            mono: (text) => text.normalize("NFD").split('').map(c => mapChar(c, 'mono')).join(''),
+            doubleStruck: (text) => text.normalize("NFD").split('').map(c => mapChar(c, 'doubleStruck')).join(''),
+            script: (text) => text.normalize("NFD").split('').map(c => mapChar(c, 'script')).join(''),
+            scriptBold: (text) => text.normalize("NFD").split('').map(c => mapChar(c, 'scriptBold')).join(''),
+            fraktur: (text) => text.normalize("NFD").split('').map(c => mapChar(c, 'fraktur')).join(''),
+            frakturBold: (text) => text.normalize("NFD").split('').map(c => mapChar(c, 'frakturBold')).join(''),
+            bubble: (text) => text.normalize("NFD").split('').map(c => mapChar(c, 'bubble')).join(''),
+            negativeBubble: (text) => text.normalize("NFD").split('').map(c => mapChar(c, 'negativeBubble')).join(''),
+            square: (text) => text.normalize("NFD").split('').map(c => mapChar(c, 'square')).join(''),
+            negativeSquare: (text) => text.normalize("NFD").split('').map(c => mapChar(c, 'negativeSquare')).join(''),
+            smallCaps: (text) => text.normalize("NFD").split('').map(c => mapChar(c, 'smallCaps')).join(''),
+            strikeThrough: (text) => text.split('').map(c => mapChar(c, 'strikeThrough')).join(''),
+            underline: (text) => text.split('').map(c => mapChar(c, 'underline')).join(''),
+            slashThrough: (text) => text.split('').map(c => mapChar(c, 'slashThrough')).join(''),
+            upsideDown: (text) => text.normalize("NFD").split('').map(c => mapChar(c, 'upsideDown')).reverse().join('')
+        };
+
+        function updateStylePreviews() {
+            const el = document.getElementById('data-input');
+            const start = el.selectionStart;
+            const end = el.selectionEnd;
+            
+            let selectedText = "";
+            let isSelectionMode = false;
+            if (start !== end) {
+                selectedText = el.value.substring(start, end);
+                isSelectionMode = true;
+            } else {
+                selectedText = el.value || "Viết chữ nghệ thuật";
+            }
+            
+            const previewContainer = $('#style-previews-list');
+            previewContainer.empty();
+            
+            const styleList = [
+                { name: "Chữ đậm (Serif)", key: "bold" },
+                { name: "Chữ nghiêng (Serif)", key: "italic" },
+                { name: "Chữ đậm nghiêng (Serif)", key: "boldItalic" },
+                { name: "Chữ đậm (Sans)", key: "sansBold" },
+                { name: "Chữ nghiêng (Sans)", key: "sansItalic" },
+                { name: "Chữ đậm nghiêng (Sans)", key: "sansBoldItalic" },
+                { name: "Đơn cách (Monospace)", key: "mono" },
+                { name: "Nét đôi (Blackboard)", key: "doubleStruck" },
+                { name: "Viết tay (Script)", key: "script" },
+                { name: "Viết tay đậm (Script)", key: "scriptBold" },
+                { name: "Gothic cổ điển (Fraktur)", key: "fraktur" },
+                { name: "Gothic đậm", key: "frakturBold" },
+                { name: "Bong bóng (Circled)", key: "bubble" },
+                { name: "Bong bóng ngược (Negative)", key: "negativeBubble" },
+                { name: "Ô vuông (Squared)", key: "square" },
+                { name: "Ô vuông ngược (Negative)", key: "negativeSquare" },
+                { name: "Chữ nhỏ (Small Caps)", key: "smallCaps" },
+                { name: "Gạch ngang chữ", key: "strikeThrough" },
+                { name: "Gạch chân chữ", key: "underline" },
+                { name: "Gạch chéo chữ", key: "slashThrough" },
+                { name: "Lật ngược chữ (Upside)", key: "upsideDown" }
+            ];
+            
+            styleList.forEach(style => {
+                let styledText = "";
+                try {
+                    styledText = stylers[style.key](selectedText);
+                } catch (e) {
+                    styledText = selectedText;
+                }
+                
+                const row = $(`
+                    <div class="style-row d-flex justify-content-between align-items-center py-2 border-bottom border-light-subtle">
+                        <div class="style-info flex-grow-1 me-2" style="max-width: calc(100% - 100px);">
+                            <div class="style-name text-muted small fw-semibold">${style.name}</div>
+                            <div class="style-text text-dark fw-semibold fs-6 mt-1 text-break">${styledText}</div>
+                        </div>
+                        <div class="style-actions d-flex gap-1 flex-shrink-0">
+                            <button class="btn btn-outline-primary btn-sm btn-apply-style py-1 px-2 fw-bold" data-style="${style.key}" style="font-size: 0.78rem;" title="Áp dụng vào đoạn bôi đen">
+                                Chọn
+                            </button>
+                            <button class="btn btn-outline-secondary btn-sm btn-copy-style p-1" data-text="${styledText.replace(/"/g, '&quot;')}" title="Sao chép nhanh kiểu này">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-copy" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V2Zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H6Z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                `);
+                previewContainer.append(row);
+            });
+            
+            const guideText = isSelectionMode 
+                ? "Đang chọn kiểu cho phần bôi đen." 
+                : "Bôi đen phần chữ cần đổi kiểu trong ô nhập liệu.";
+            $('#styles-guide-msg').text(guideText);
+        }
+
         getDataKeywords();
         initDataTagW();
+        updateStylePreviews();
+        adjustTextSize();
+        
+        // Hide style collapse when emoji triggers
         $('#show-hide-a').click(function () {
-            $('.collapse').collapse('toggle');
+            $('#collapseStyles').collapse('hide');
+            try {
+                var collapseElement = document.getElementById('collapseOne');
+                var bsCollapse = bootstrap.Collapse.getInstance(collapseElement);
+                if (!bsCollapse) {
+                    bsCollapse = new bootstrap.Collapse(collapseElement, { toggle: false });
+                }
+                bsCollapse.toggle();
+            } catch (e) {
+                $('#collapseOne').toggleClass('show');
+            }
         });
+
+        // Hide emoji collapse when style triggers
+        $('#show-hide-styles').click(function () {
+            $('#collapseOne').collapse('hide');
+            try {
+                var collapseElement = document.getElementById('collapseStyles');
+                var bsCollapse = bootstrap.Collapse.getInstance(collapseElement);
+                if (!bsCollapse) {
+                    bsCollapse = new bootstrap.Collapse(collapseElement, { toggle: false });
+                }
+                bsCollapse.toggle();
+            } catch (e) {
+                $('#collapseStyles').toggleClass('show');
+            }
+        });
+        
         $('#data-input').bind('input propertychange', function () {
-            // $("#yourBtnID").hide();
-            // if (this.value.length) {
-            //     $("#data-input").show();
-            // }
             makeData(this.value);
-            // console.log(this.value);
+            updateStylePreviews();
+            adjustTextSize();
         });
+
+        $('#data-input').on('keyup mouseup select focus', function() {
+            updateStylePreviews();
+        });
+
+        $(document).on('click', '.btn-apply-style', function() {
+            const styleKey = $(this).data('style');
+            const el = document.getElementById('data-input');
+            const start = el.selectionStart;
+            const end = el.selectionEnd;
+            const text = el.value;
+            
+            let selectedText = "";
+            if (start !== end) {
+                selectedText = text.substring(start, end);
+            } else {
+                selectedText = text;
+            }
+            
+            if (!selectedText) {
+                showToast('Vui lòng nhập văn bản trước!', false);
+                return;
+            }
+            
+            const styled = stylers[styleKey](selectedText);
+            
+            el.focus();
+            el.setSelectionRange(start, end);
+            
+            try {
+                // Use execCommand to preserve Undo history stack
+                const result = document.execCommand('insertText', false, styled);
+                if (!result) {
+                    throw new Error('execCommand returned false');
+                }
+            } catch (e) {
+                // Fallback if execCommand fails
+                const before = text.substring(0, start);
+                const after = text.substring(end, text.length);
+                el.value = before + styled + after;
+                makeData(el.value);
+            }
+            
+            // Re-select the styled text
+            el.selectionStart = start;
+            el.selectionEnd = start + styled.length;
+            
+            updateStylePreviews();
+            adjustTextSize();
+            showToast('Đã áp dụng kiểu chữ nghệ thuật!');
+        });
+
+        $(document).on('click', '.btn-copy-style', function() {
+            const textToCopy = $(this).attr('data-text');
+            if (!textToCopy) return;
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                showToast('Đã sao chép kiểu chữ!');
+            }).catch(err => {
+                showToast('Lỗi khi sao chép!', false);
+            });
+        });
+        
         $('#b-key-word').click(function () {
             localStorage.setItem('data-keyword', $('#key-word').val());
             getDataKeywords(true);
@@ -124,10 +879,12 @@
             } catch (error) {
                 
             }
+            showToast('Lưu dữ liệu từ khoá thành công!');
         });
 
         $('#b-tag-word').click(function () {
             localStorage.setItem('data-tag', $('#tag-word').val());
+            showToast('Lưu dữ liệu Tag Line thành công!');
         });
 
         function initDataTagW(){
@@ -159,13 +916,19 @@
             });
             window.keyword = dataSetting;
             $("#kk").text(dataSetting.length);
-            // console.log(window.keyword);
             if (isFirst == null) {
                 $("#key-word").val(settingInput);
             }
         }
+        
         window.copyN = "";
+        
         function makeData(dataR) {
+            if (!dataR) {
+                $("#data-done").html('<span class="output-placeholder">Nội dung sau khi kiểm tra và lọc từ khoá vi phạm sẽ hiển thị tại đây...</span>');
+                window.copyN = "";
+                return "";
+            }
             let dataUse = window.keyword;
             let data = dataR;
             for (let i = 0; i < dataUse.length; i++) {
@@ -186,13 +949,21 @@
             $("#data-done").html(dataDone);
             return dataDone;
         }
+        
         $('#copy-done').click(async function () {
-            await navigator.clipboard.writeText(window.copyN);
+            if (!window.copyN) {
+                showToast('Chưa có nội dung để sao chép!', false);
+                return;
+            }
+            try {
+                await navigator.clipboard.writeText(window.copyN);
+                showToast('Sao chép nội dung thành công!');
+            } catch (err) {
+                showToast('Không thể sao chép tự động!', false);
+            }
         });
 
-
         document.querySelector('emoji-picker').addEventListener('emoji-click', e => {
-            // textFieldEdit.insert(document.querySelector('input'), e.detail.unicode)
             insertAtCursor($("#data-input"), e.detail.unicode);
         });
 
@@ -209,9 +980,32 @@
             return false;
         }
 
+        function adjustTextSize() {
+            const val = $('#data-input').val();
+            // Facebook uses 85 character threshold for larger font sizes
+            if (val.length > 0 && val.length <= 85) {
+                $('#data-input').css({ 'font-size': '22px', 'line-height': '1.25' });
+                $('#data-done').css({ 'font-size': '22px', 'line-height': '1.25' });
+            } else {
+                $('#data-input').css({ 'font-size': '15px', 'line-height': '1.4' });
+                $('#data-done').css({ 'font-size': '15px', 'line-height': '1.4' });
+            }
+        }
+
+        function showToast(message, isSuccess = true) {
+            $('#toast-message').text(message);
+            var toastEl = document.getElementById('appToast');
+            if (isSuccess) {
+                toastEl.classList.remove('bg-danger');
+                toastEl.classList.add('bg-success');
+            } else {
+                toastEl.classList.remove('bg-success');
+                toastEl.classList.add('bg-danger');
+            }
+            var toast = new bootstrap.Toast(toastEl);
+            toast.show();
+        }
     </script>
-
-
 </body>
 
 </html>
